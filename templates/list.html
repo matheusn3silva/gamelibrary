@@ -19,11 +19,11 @@
             </tr>
         </thead>
         <tbody>
-        {% for jogo in jogos %}
+        {% for game in games %}
            <tr>
-              <td>{{ jogo.nome }}</td>
-              <td>{{ jogo.categoria }}</td>
-              <td>{{ jogo.console }}</td>
+              <td>{{ game.name }}</td>
+              <td>{{ game.category }}</td>
+              <td>{{ game.console }}</td>
            </tr>
         {% endfor %}
         </tbody>
