@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 class Game:
     def __init__(self, name, category, console):
@@ -30,6 +30,6 @@ def createGame():
     game = Game(name, category, console)
 
     gameList.append(game)
-    return render_template('list.html', title='Jogos', games=gameList)
+    return redirect('/')
 
 app.run(debug=True)
