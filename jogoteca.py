@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 
 class Game:
     def __init__(self, name, category, console):
@@ -20,6 +20,9 @@ def index():
 
 @app.route('/new')
 def newGame():
+    if 'logged_user' not in session or session['logged_user'] == None:
+        return redirect(url_for('login', next=url_for('newGame')))
+
     return render_template('new.html', title='Novo Jogo')
 
 @app.route('/create', methods=['POST',])
@@ -31,28 +34,30 @@ def createGame():
     game = Game(name, category, console)
 
     gameList.append(game)
-    return redirect('/')
+    return redirect(url_for('index'))
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    next = request.args.get('next')
+    return render_template('login.html', next=next)
 
 
 @app.route('/authenticate', methods=['POST',])
 def authenticate():
     if request.form['password'] =='alohomora':
-        session['user_loged'] = request.form['user']
-        flash(f'Usuário {session['user_loged']} logado com sucesso!')
-        return redirect('/')
+        session['logged_user'] = request.form['user']
+        flash(f'Usuário {session['logged_user']} logado com sucesso!')
+        next_page = request.form['next']
+        return redirect(next_page)
     else:
         flash('Usuário não logado')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
 
 @app.route('/logout')
 def logout():
-    session['user_loged'] = None
+    session['logged_user'] = None
     flash('Logout efetuado com sucesso!')
-    return redirect('/')
+    return redirect(url_for('index'))
 
 app.run(debug=True)
