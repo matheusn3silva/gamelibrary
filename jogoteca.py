@@ -11,6 +11,18 @@ game2 = Game('Stardew Valley', 'Simulação', 'Computador')
 game3 = Game('Remnant from the Ashes', 'Souls Like', 'Xbox')
 gameList = [game1, game2, game3]
 
+
+class User:
+    def __init__(self, name, nickname, password):
+        self.name = name
+        self.nickname = nickname
+        self.password = password
+
+user1 = User('Matheus Nasicmento', 'Manasi', 'alohomora')
+user2 = User('Camila Ferreira', 'Mila', 'milinha')
+user3 = User('Guilherme Louro', 'Cake', 'python')
+
+users = { user1.nickname: user1, user2.nickname: user2, user3.nickname: user3 }
 app = Flask(__name__)
 app.secret_key = 'alura'
 
@@ -44,11 +56,13 @@ def login():
 
 @app.route('/authenticate', methods=['POST',])
 def authenticate():
-    if request.form['password'] =='alohomora':
-        session['logged_user'] = request.form['user']
-        flash(f'Usuário {session['logged_user']} logado com sucesso!')
-        next_page = request.form['next']
-        return redirect(next_page)
+    if request.form['user'] in users:
+        user = users[request.form['user']]
+        if request.form['password'] == user.password:
+            session['logged_user'] = user.nickname
+            flash(f'Usuário {user.nickname} logado com sucesso!')
+            next_page = request.form['next']
+            return redirect(next_page)
     else:
         flash('Usuário não logado')
         return redirect(url_for('login'))
