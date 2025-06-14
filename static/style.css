@@ -3,7 +3,7 @@
 }
 
 a {
-    color: #f3f3f3;
+    color: #333;
     text-decoration: none;
     transition: color 0.25s ease-in-out;
 }
@@ -17,12 +17,19 @@ nav {
     display: flex;
     justify-content: space-between;
 
+
+    #logo {
+        font-weight: bold;
+        font-size: 24px;
+    }
+
     ul {
         display: flex;
         gap: 16px;
         list-style: none;
 
         li > a {
+            color: #f3f3f3;
             background: #0dcaf0;
             padding: 8px 16px;
             border-radius: 2px;
