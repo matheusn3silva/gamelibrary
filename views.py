@@ -30,21 +30,33 @@ def createGame():
     new_game = Games(name=name, category=category, console=console)
 
     db.session.add(new_game)
-
     db.session.commit()
 
     return redirect(url_for('index'))
 
 # ==========================EDIT GAME===================================
-@app.route('/edit')
-def editGame():
+@app.route('/edit/<int:id>')
+def editGame(id):
     if 'logged_user' not in session or session['logged_user'] == None:
         return redirect(url_for('login', next=url_for('editGame')))
-    return render_template('edit.html', title='Editando Jogo')
+
+    game = Games.query.filter_by(id=id).first()
+    return render_template('edit.html', title='Editando Jogo', game=game)
 
 @app.route('/update', methods=['POST'],)
 def updateGame():
-    pass
+    game = Games.query.filter_by(id=request.form['id']).first()
+
+    game.name = request.form['name']
+    game.category = request.form['category']
+    game.console = request.form['console']
+
+    db.session.add(game)
+    db.session.commit()
+
+    return redirect(url_for('index'))
+
+# ==========================DELETE GAME=================================
 
 
 # ==========================LOGIN AUTHENTICATE==========================
