@@ -37,9 +37,17 @@ nav {
     }
 }
 
-td > a {
-    width: 100%;
-    display: block;
-    text-align: center;
-    padding: 2px 0;
+td#buttons-games {
+    display: flex;
+    gap: 8px;
+
+
+    a {
+        width: 100%;
+        display: block;
+        text-align: center;
+        padding: 2px 0;
+        background: #333;
+        color: #f6f6f6;
+    }
 }
