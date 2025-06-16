@@ -1,6 +1,7 @@
-from flask import render_template, request, redirect, session, flash, url_for
+from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from jogoteca import app, db
 from models import Games, Users
+from helpers import recovery_image
 
 @app.route('/')
 def index():
@@ -28,9 +29,12 @@ def createGame():
         return redirect(url_for('index'))
 
     new_game = Games(name=name, category=category, console=console)
-
     db.session.add(new_game)
     db.session.commit()
+
+    archive = request.files['archive']
+    upload_path = app.config['UPLOAD_PATH']
+    archive.save(f'{upload_path}/cover{new_game.id}.jpg')
 
     return redirect(url_for('index'))
 
@@ -38,10 +42,11 @@ def createGame():
 @app.route('/edit/<int:id>')
 def editGame(id):
     if 'logged_user' not in session or session['logged_user'] == None:
-        return redirect(url_for('login', next=url_for('editGame')))
+        return redirect(url_for('login', next=url_for('editGame', id=id)))
 
     game = Games.query.filter_by(id=id).first()
-    return render_template('edit.html', title='Editando Jogo', game=game)
+    cover_game = recovery_image(id)
+    return render_template('edit.html', title='Editando Jogo', game=game, archive_name=cover_game)
 
 @app.route('/update', methods=['POST'],)
 def updateGame():
@@ -54,10 +59,13 @@ def updateGame():
     db.session.add(game)
     db.session.commit()
 
+    archive = request.files['archive']
+    upload_path = app.config['UPLOAD_PATH']
+    archive.save(f'{upload_path}/cover{game.id}.jpg')
+
     return redirect(url_for('index'))
 
 # ==========================DELETE GAME=================================
-
 @app.route('/delete/<int:id>')
 def deleteGame(id):
     if 'logged_user' not in session or session['logged_user'] == None:
@@ -71,7 +79,6 @@ def deleteGame(id):
     return redirect(url_for('index'))
 
 # ==========================LOGIN AUTHENTICATE==========================
-
 @app.route('/login')
 def login():
     next = request.args.get('next')
@@ -98,3 +105,11 @@ def logout():
     session['logged_user'] = None
     flash('Logout efetuado com sucesso!')
     return redirect(url_for('index'))
+
+# ==========================IMAGE PATH==========================
+
+@app.route('/uploads/<archive_name>')
+def image(archive_name):
+    return send_from_directory(app.config["UPLOAD_PATH"], archive_name)
+
+
