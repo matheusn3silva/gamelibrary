@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from jogoteca import app, db
 from models import Games, Users
-from helpers import recovery_image
+from helpers import recovery_image, cover_delete
+import time
 
 @app.route('/')
 def index():
@@ -34,7 +35,8 @@ def createGame():
 
     archive = request.files['archive']
     upload_path = app.config['UPLOAD_PATH']
-    archive.save(f'{upload_path}/cover{new_game.id}.jpg')
+    timestamp = time.time()
+    archive.save(f'{upload_path}/cover{new_game.id}-{timestamp}.jpg')
 
     return redirect(url_for('index'))
 
@@ -46,7 +48,7 @@ def editGame(id):
 
     game = Games.query.filter_by(id=id).first()
     cover_game = recovery_image(id)
-    return render_template('edit.html', title='Editando Jogo', game=game, archive_name=cover_game)
+    return render_template('edit.html', title='Editando Jogo', game=game, cover_game=cover_game)
 
 @app.route('/update', methods=['POST'],)
 def updateGame():
@@ -61,7 +63,9 @@ def updateGame():
 
     archive = request.files['archive']
     upload_path = app.config['UPLOAD_PATH']
-    archive.save(f'{upload_path}/cover{game.id}.jpg')
+    timestamp = time.time()
+    cover_delete(game.id)
+    archive.save(f'{upload_path}/cover{game.id}-{timestamp}.jpg')
 
     return redirect(url_for('index'))
 
